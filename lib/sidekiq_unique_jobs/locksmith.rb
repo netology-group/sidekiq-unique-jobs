@@ -127,6 +127,10 @@ module SidekiqUniqueJobs
       redis { |rcon| taken?(rcon) }
     end
 
+    def limit_reached?(conn = nil)
+      call_script(:limit_reached, key.to_a, argv, conn)
+    end
+
     #
     # Nicely formatted string with information about self
     #

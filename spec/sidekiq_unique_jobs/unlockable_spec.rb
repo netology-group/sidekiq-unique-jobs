@@ -57,4 +57,19 @@ RSpec.describe SidekiqUniqueJobs::Unlockable do
       expect { delete! }.to change { unique_keys.size }.by(-3)
     end
   end
+
+  describe ".limit_reached?" do
+    subject(:limit_reached?) { described_class.limit_reached?(worker_class, args, queue) }
+
+    it "returns false" do
+      expect(limit_reached?).to be false
+    end
+
+    context "when item pushed" do
+      it "returns true" do
+        expect { push_item(item) }.to change { unique_keys.size }.by(3)
+        expect(limit_reached?).to be true
+      end
+    end
+  end
 end
