@@ -39,5 +39,19 @@ module SidekiqUniqueJobs
       SidekiqUniqueJobs::Job.add_digest(item)
       SidekiqUniqueJobs::Locksmith.new(item).delete!
     end
+
+    # Tests job is limit reached
+    # @return [true] if job reached
+    # @return [false] if job not reached
+    def limit_reached?(worker_class, args = [], queue = nil)
+      item = worker_class.sidekiq_options.merge({
+        "class" => worker_class.to_s,
+        "args" => args,
+        "queue" => queue,
+      }.compact)
+
+      SidekiqUniqueJobs::Job.add_digest(item)
+      !!SidekiqUniqueJobs::Locksmith.new(item).limit_reached?
+    end
   end
 end
